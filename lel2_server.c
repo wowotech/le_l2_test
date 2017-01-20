@@ -77,12 +77,11 @@ int main(void)
 	while (1) {
 		ret = read(newfd, test_buf, TEST_BUF_LEN);
 		if (ret < 0) {
-			perror("read\n");
+			perror("read err");
+			exit(1);
 		} else {
 			printf("%d received\n", ret);
 		}
-
-		usleep(10000000);
 	}
 
 	return 0;

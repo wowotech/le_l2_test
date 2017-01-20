@@ -1,1 +1,40 @@
 A test code to verify Bluetooth LE's l2cap.
+
+0. environment
+  Ubuntu with bluez support(hciconfig, hcitool, etc.).
+
+1. preparation
+  # install libbluetooth-dev
+  sudo apt-get install libbluetooth-dev
+
+2. build
+  # just make it.
+  cd ./le_l2_test
+  make
+
+3. run
+3.1 server side
+  # ensure BLE is ready, for example:
+  hciconfig
+  hci0:   Type: BR/EDR  Bus: UART
+          BD Address: 00:02:F7:00:60:28  ACL MTU: 256:4  SCO MTU: 0:0
+          UP RUNNING
+          RX bytes:914 acl:0 sco:0 events:60 errors:0
+          TX bytes:436 acl:0 sco:0 commands:50 errors:0
+
+  # enable BLE's advertising (0, Connectable undirected advertising)
+  sudo hciconfig hci0 reset     # may need, who knows...
+  sudo hciconfig hci0 leadv 0
+
+  # run server
+  ./lel2_server
+
+  # then, enjoy it.
+
+3.2 client side
+  # ensure BLE is ready, for example:
+
+  # run client with server's bluetooth address
+  ./lel2_client 00:02:F7:00:60:28
+
+  # then, enjoy it.
