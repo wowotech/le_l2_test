@@ -77,7 +77,7 @@ int main(int argc , char **argv) {
 		if (ret != sizeof(test_data)) {
 			perror("write\n");
 		}
-		usleep(10000000);
+		usleep(1000000);
 	}
 
 	printf("exit\n");
