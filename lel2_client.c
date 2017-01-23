@@ -24,17 +24,25 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 
-#define TEST_CID		4	/* TEST CID, 4 is ATT */
+#include <sys/time.h>
 
-static char test_data[] = "Test data for le_l2_test. 12345abc!#";
+#include "common.h"
+
+static char		test_data[TEST_BUF_LEN];
+
+static char		test_buf[TEST_BUF_LEN];
 
 int main(int argc , char **argv) {
 	int sockfd;
-	int err = 0;
+	int i, err = 0, test_counter = 0;
 	ssize_t ret;
 
 	struct sockaddr_l2 bind_addr = { 0 };
 	struct sockaddr_l2 conn_addr = { 0 };
+
+	struct timeval starttime, endtime;
+
+	float time_consumed_us;
 
 	printf("socket\n");
 
@@ -70,16 +78,46 @@ int main(int argc , char **argv) {
 		return -1;
 	}
 
-	printf("send...\n");
+	printf("send, receive and verify...\n");
 
-	while (1) {
-		ret = write(sockfd, test_data, sizeof(test_data));
-		if (ret != sizeof(test_data)) {
-			perror("write\n");
+	/* prepare for test data */
+	for (i = 0; i < TEST_BUF_LEN; i++)
+		test_data[i] = random() & 0xff;
+
+	time_consumed_us = 0;
+	while (++test_counter <= TEST_CNT) {
+		printf("test_counter: %d\n", test_counter);
+
+		gettimeofday(&starttime, NULL);
+
+		/* write */
+		ret = write(sockfd, test_data, TEST_BUF_LEN);
+		if (ret != TEST_BUF_LEN) {
+			perror("write error\n");
+			return -1;
 		}
-		usleep(1000000);
+
+		/* read back */
+		ret = read(sockfd, test_buf, TEST_BUF_LEN);
+
+		gettimeofday(&endtime, NULL);
+
+		/* verify */
+		if (ret != TEST_BUF_LEN) {
+			perror("length verify failed\n");
+			return -1;
+		}
+		if (memcmp(test_buf, test_data, TEST_BUF_LEN) != 0) {
+			perror("content verify failed\n");
+			return -1;
+		}
+
+		time_consumed_us += (endtime.tv_usec - starttime.tv_usec
+				     + 1000000 * (endtime.tv_sec
+						  - starttime.tv_sec));
 	}
 
-	printf("exit\n");
+	printf("TEST END: time consumed %f us, bps is %d\n", time_consumed_us,
+	       TEST_BUF_LEN * TEST_CNT * 1000000 / (int)time_consumed_us);
 	return 0;
 }

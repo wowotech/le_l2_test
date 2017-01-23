@@ -24,11 +24,9 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 
-#define TEST_CID		4	/* TEST CID, 4 is ATT */
+#include "common.h"
 
-#define TEST_BUF_LEN		32
-
-static char			test_buf[TEST_BUF_LEN];
+static char		test_buf[TEST_BUF_LEN];
 
 int main(void)
 {
@@ -72,15 +70,20 @@ int main(void)
 		exit(1);
 	}
 
-	printf("receive\n");
+	printf("receive and send back...\n");
 
 	while (1) {
 		ret = read(newfd, test_buf, TEST_BUF_LEN);
-		if (ret < 0) {
-			perror("read err");
+		if (ret != TEST_BUF_LEN) {
+			perror("read error");
 			exit(1);
-		} else {
-			printf("%d received\n", ret);
+		}
+		printf("received\n");
+
+		ret = write(newfd, test_buf, TEST_BUF_LEN);
+		if (ret != TEST_BUF_LEN) {
+			perror("write error\n");
+			return -1;
 		}
 	}
 
