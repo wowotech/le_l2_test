@@ -117,7 +117,7 @@ int main(int argc , char **argv) {
 						  - starttime.tv_sec));
 	}
 
-	printf("TEST END: time consumed %f us, bps is %d\n", time_consumed_us,
-	       TEST_BUF_LEN * TEST_CNT * 1000000 / (int)time_consumed_us);
+	printf("TEST END: time consumed %f us, Bps is %f\n", time_consumed_us,
+	       (double)TEST_BUF_LEN * TEST_CNT * 1000000 * 2 / time_consumed_us);
 	return 0;
 }

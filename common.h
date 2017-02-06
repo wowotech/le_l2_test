@@ -18,7 +18,7 @@
 
 #define TEST_CID	(4)	/* TEST CID, 4 is ATT */
 
-#define TEST_BUF_LEN	(16)
+#define TEST_BUF_LEN	(128)
 
 #define TEST_CNT	(50)
 
